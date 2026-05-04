@@ -1,37 +1,20 @@
 import { useState } from 'react'
 import Login from './pages/Login'
-import Overview from './pages/Overview'
-import Procurement from './pages/Procurement'
-import Manufacturing from './pages/Manufacturing'
-import Logistics from './pages/Logistics'
-import Results from './pages/Results'
+import Projects from './pages/Projects'
+import Portfolio from './pages/Portfolio'
+import SiteDetail from './pages/SiteDetail'
 import Layout from './components/Layout'
 
 export default function App() {
   const [user, setUser] = useState(null)
-  const [page, setPage] = useState('overview')
-  const [projectData, setProjectData] = useState({
-    procurement: null,
-    manufacturing: null,
-    logistics: null,
-    results: null,
-  })
-
-  if (!user) return <Login onLogin={setUser} />
-
-  const nav = (p) => setPage(p)
-
-  const pages = {
-    overview: <Overview nav={nav} projectData={projectData} user={user} />,
-    procurement: <Procurement nav={nav} projectData={projectData} setProjectData={setProjectData} />,
-    manufacturing: <Manufacturing nav={nav} projectData={projectData} setProjectData={setProjectData} />,
-    logistics: <Logistics nav={nav} projectData={projectData} setProjectData={setProjectData} />,
-    results: <Results nav={nav} projectData={projectData} setProjectData={setProjectData} />,
-  }
-
+  const [view, setView] = useState({ page:'projects', project:null, site:null })
+  if (!user) return <Login onLogin={setUser}/>
+  const nav = (page, project=null, site=null) => setView({ page, project, site })
   return (
-    <Layout page={page} nav={nav} user={user} setUser={setUser}>
-      {pages[page] || pages.overview}
+    <Layout view={view} nav={nav} user={user} setUser={setUser}>
+      {view.page==='projects'  && <Projects  nav={nav} user={user}/>}
+      {view.page==='portfolio' && <Portfolio nav={nav} project={view.project}/>}
+      {view.page==='site'      && <SiteDetail nav={nav} project={view.project} site={view.site}/>}
     </Layout>
   )
 }

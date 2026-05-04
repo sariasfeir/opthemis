@@ -1,88 +1,60 @@
-const stages = [
-  { key: 'procurement', label: 'Raw materials', sub: 'Procurement', color: '#5DCAA5' },
-  { key: 'manufacturing', label: 'Manufacturing', sub: 'Operations', color: '#1D9E75' },
-  { key: 'logistics', label: 'Distribution', sub: 'Logistics', color: '#0F6E56' },
-  { key: 'results', label: 'Results', sub: 'Consultant / All', color: '#BA7517' },
-]
+import { LogoMark } from '../pages/Login'
 
-export default function Layout({ children, page, nav, user, setUser }) {
+const STAGE_COLORS = { procurement:'#22B578', manufacturing:'#1A9060', logistics:'#0F5C3E', results:'#B07218' }
+
+export default function Layout({ children, view, nav, user, setUser }) {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'var(--head)' }}>
-      {/* Sidebar */}
-      <div style={{
-        width: '220px', flexShrink: 0,
-        background: 'var(--surface)', borderRight: '0.5px solid var(--border)',
-        display: 'flex', flexDirection: 'column'
-      }}>
-        {/* Logo */}
-        <div style={{
-          padding: '16px', borderBottom: '0.5px solid var(--border)',
-          display: 'flex', alignItems: 'center', gap: '8px'
-        }}>
-          <div style={{
-            width: '28px', height: '28px', background: 'var(--g3)',
-            borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
-          }}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <polygon points="7,1 13,12 1,12" fill="white"/>
-            </svg>
-          </div>
-          <span style={{ fontWeight: '700', fontSize: '16px' }}>OpThemis</span>
+    <div className="app">
+      <div className="sidebar">
+        <div className="nav-logo" onClick={() => nav('projects')}>
+          <LogoMark size={22}/>
+          <span>OpThemis</span>
         </div>
 
-        {/* Overview link */}
-        <div style={{ padding: '8px 0 4px' }}>
-          <button onClick={() => nav('overview')} style={{
-            width: '100%', textAlign: 'left', border: 'none', background: 'transparent',
-            padding: '9px 16px', fontSize: '13px', fontFamily: 'var(--head)',
-            fontWeight: page === 'overview' ? '500' : '400',
-            color: page === 'overview' ? 'var(--text)' : 'var(--muted)',
-            borderLeft: `2px solid ${page === 'overview' ? 'var(--g3)' : 'transparent'}`,
-            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px'
-          }}>
-            <span style={{ fontSize: '14px' }}>◎</span> Overview
-          </button>
+        <div style={{ flex:1, overflowY:'auto', paddingTop:'4px' }}>
+          <NavItem label="Projects" icon={<GridIcon/>} active={view.page==='projects'} onClick={() => nav('projects')}/>
+
+          {view.project && (<>
+            <div className="nav-section">{view.project.company}</div>
+            <NavItem label="Portfolio" icon={<ListIcon/>} active={view.page==='portfolio'} onClick={() => nav('portfolio', view.project)}/>
+            {view.site && (
+              <NavItem label={view.site.name} icon={<FactoryIcon/>} active={view.page==='site'} onClick={() => nav('site', view.project, view.site)} sub="Site analysis"/>
+            )}
+          </>)}
         </div>
 
-        {/* Stage section */}
-        <div style={{ padding: '4px 16px 6px', fontSize: '10px', fontFamily: 'var(--mono)', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-          Lifecycle stages
-        </div>
-        {stages.map(s => (
-          <button key={s.key} onClick={() => nav(s.key)} style={{
-            width: '100%', textAlign: 'left', border: 'none', background: page === s.key ? 'var(--bg)' : 'transparent',
-            padding: '9px 16px', cursor: 'pointer', fontFamily: 'var(--head)',
-            borderLeft: `2px solid ${page === s.key ? 'var(--g3)' : 'transparent'}`,
-            display: 'flex', alignItems: 'center', gap: '10px'
-          }}>
-            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: s.color, flexShrink: 0 }} />
-            <div>
-              <div style={{ fontSize: '13px', fontWeight: page === s.key ? '500' : '400', color: page === s.key ? 'var(--text)' : 'var(--muted)' }}>{s.label}</div>
-              <div style={{ fontSize: '10px', fontFamily: 'var(--mono)', color: 'var(--muted)' }}>{s.sub}</div>
-            </div>
-          </button>
-        ))}
-
-        {/* Spacer */}
-        <div style={{ flex: 1 }} />
-
-        {/* User */}
-        <div style={{ padding: '12px 16px', borderTop: '0.5px solid var(--border)' }}>
-          <div style={{ fontSize: '12px', fontWeight: '500' }}>{user?.name}</div>
-          <div style={{ fontSize: '10px', fontFamily: 'var(--mono)', color: 'var(--muted)', marginTop: '1px' }}>{user?.role}</div>
-          <button onClick={() => setUser(null)} style={{
-            marginTop: '8px', fontSize: '11px', fontFamily: 'var(--mono)',
-            color: 'var(--muted)', background: 'none', border: 'none', padding: '0', cursor: 'pointer'
-          }}>Sign out</button>
+        <div className="nav-footer">
+          <div className="nav-user">{user?.name}</div>
+          <div className="nav-role">{user?.role}</div>
+          <button className="nav-signout" onClick={() => setUser(null)}>Sign out</button>
         </div>
       </div>
 
-      {/* Main content */}
-      <div style={{ flex: 1, overflow: 'auto', padding: '32px' }}>
-        <div style={{ maxWidth: '760px' }}>
-          {children}
-        </div>
+      <div className="main">
+        <div className="inner">{children}</div>
       </div>
     </div>
   )
+}
+
+function NavItem({ label, icon, active, onClick, sub }) {
+  return (
+    <button className={`nav-item ${active ? 'active' : ''}`} onClick={onClick}>
+      <span style={{ width:14, height:14, flexShrink:0, opacity: active ? 1 : 0.6 }}>{icon}</span>
+      <div>
+        <div>{label}</div>
+        {sub && <div style={{ fontSize:'10px', fontFamily:'var(--mono)', color:'var(--ink-4)', marginTop:'1px' }}>{sub}</div>}
+      </div>
+    </button>
+  )
+}
+
+function GridIcon() {
+  return <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/><rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/></svg>
+}
+function ListIcon() {
+  return <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"><line x1="1" y1="3.5" x2="13" y2="3.5"/><line x1="1" y1="7" x2="13" y2="7"/><line x1="1" y1="10.5" x2="13" y2="10.5"/></svg>
+}
+function FactoryIcon() {
+  return <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12V6.5l3.5-2v2l4-3v3l3.5-1.5V12H1z"/></svg>
 }

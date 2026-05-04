@@ -1,0 +1,3 @@
+Factory name,Country,Industry,Production (t/y),Scope 1 (tCO2),Scope 2 (tCO2),Scope 3 (tCO2),CO2 cost (CHF/tCO2)
+Kempten Plant,Germany,Dairy processing,3800,980,1190,390,42
+Munich Distribution,Germany,Cold storage,1200,180,420,95,38
